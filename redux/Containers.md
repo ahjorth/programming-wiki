@@ -53,7 +53,8 @@ function mapDispatchToProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapDispatchToProps)(MyComponent);
+// if there's only a dispatch mapped, pass null as first argument to `connect()`
+export default connect(null, mapDispatchToProps)(MyComponent);
 ```
 
 To map both state and dispatch to props:
