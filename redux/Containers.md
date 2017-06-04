@@ -9,7 +9,9 @@ import { connect } from 'react-redux';
 
 class MyComponent extends Component {
     render() {
-        <div>This is a react component</div>
+        return (
+            <div>This is a react component</div>
+        )
     }
 }
 
