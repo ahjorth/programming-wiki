@@ -50,15 +50,13 @@ By passing in a render method as a callback to the component prop, we can fine t
 ```
 renderField(field) {
     return (
-        <div>
-            <div className="form-group">
-                <label>{field.label}</label>
-                <input
-                    className="form-control"
-                    type="text"
-                    {...field.input}
-                />
-            </div>
+        <div className="form-group">
+            <label>{field.label}</label>
+            <input
+                className="form-control"
+                type="text"
+                {...field.input}
+            />
         </div>
     )
 }
@@ -104,7 +102,7 @@ If this method returns an empty `errors` object, `redux-form` will assert the va
 ```
 function validate(values) {
     const errors = {};
-    if(!values.title) {
+    if (!values.title) {
         errors.title = 'Enter a title';
     }
     return errors;
@@ -118,3 +116,85 @@ Above, if the title field is empty, `errors` is not empty, and `redux-form` assu
 In a render field method, you can display this fields error by referencing
 
 `field.meta.error`
+
+When component loads, however, all errors will show even if no work has been done to the field
+
+This can be solved by checking the `touched` state of the field.
+
+```
+<div className="form-control-feedback">
+    {field.meta.touched ? field.meta.error : ''}
+</div>
+```
+
+In the example above, error messages will only be shown if the field is `touched` (i.e the user focuses the input then focuses something else)
+
+## Submitting a form
+In the components render method, we pass in a function to the forms onSubmit action.
+
+When we connected `reduxForm` to `MyComponent` , `redux-form` assigned some props to our component.
+One of these props was the `handleSubmit` function.
+`handleSubmit` will only submit the form once validation has passed.
+
+Once validation has passed and `redux-form` decides everything is ready, it calls the callback we defined, called `onSubmit`.
+
+We bind our callback function to `this` to get access to the correct `this` (this can be done in the constructor or using any other method of binding)
+
+Our callback function will have the parameter `values` that represent the fields in our form.
+```
+onSubmit(values) {
+    // call action this.props.createPost(values) for example
+}
+render() {
+    const { handleSubmit } = this.props;
+    return (
+        <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
+    )
+}
+```
+
+## Hooking up action creators
+We've already connected `redux-form` to our store, so to use redux `connect()` we need to chain it
+
+```
+import { connect } from `redux`;
+import { createPost } from '../actions';
+
+(...)
+
+export default reduxForm({
+    form: 'MyComponentForm'
+})(
+    connect(null, { createPost })(MyComponent)
+);
+```
+
+## Making sure api requests finish before redirecting
+
+If the form is used in conjunction with `react-router-dom` you can redirect a user by pushing a new location to history after the form is submitted.
+
+When using API's, this can present a problem where the redirection happens before the remote server saves or updates the new resource.
+
+To make sure we only redirect after the request has finished, we can pass a callback into our action
+
+```
+onSubmit(values) {
+        this.props.createPost(values, () => {
+            this.props.history.push('/');
+        });
+    }
+```
+
+Then on the action creator, we call the callback after the promise resolves
+
+```
+export function createPost(values, callback) {
+    const request = axios.post(url, values)
+        .then(() => callback());
+
+    return {
+        type: CREATE_POST,
+        payload: request
+    }
+}
+```
