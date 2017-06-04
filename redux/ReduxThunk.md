@@ -9,6 +9,20 @@ With Thunk, you can instead return an asynchronous function that can be called w
 `npm install redux-thunk --save`
 
 ## Initializing Redux to use Redux Thunk
+`index.js`
+```
+import thunk from 'redux-thunk';
+import reducers from './reducers';
+
+const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+
+ReactDOM.render(
+    <Provider store={createStoreWithMiddleware(reducers)}>
+        <App />
+    </Provider>
+    , document.getElementById('root'));
+```
+
 
 ## Usage in an Action Creator
 
