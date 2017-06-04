@@ -3,12 +3,13 @@ Actions are payloads of information that sends data from containers to the state
 
 When passing data to the store, you **MUST** use an action
 
-An action **must return an object** where the `type` is **required**
+#### Example action creator
+An action creator is a function that creates an action.
+
+An action creator **must return an object** where the `type` is **required**
 
 Most commonly, when returning more than just the action type, a payload key is set with the payload you want to pass on
 
-#### Example action creator
-An action creator is a function that creates an action.
 
 ```
 // we define UPDATE_USERNAME as a constant to preserve the integrity of the string
